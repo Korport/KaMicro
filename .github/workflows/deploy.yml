@@ -26,6 +26,8 @@ jobs:
 
             # Clone on first deploy, pull on subsequent ones
             if [ ! -d /opt/trivia-game ]; then
+              sudo mkdir -p /opt/trivia-game
+              sudo chown $USER:$USER /opt/trivia-game
               git clone https://github.com/${{ github.repository }} /opt/trivia-game
             fi
 
