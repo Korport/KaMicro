@@ -1,0 +1,48 @@
+name: Deploy to Azure VM
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    name: Build & Deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host:     ${{ secrets.AZURE_VM_HOST }}
+          username: ${{ secrets.AZURE_VM_USER }}
+          key:      ${{ secrets.AZURE_SSH_KEY }}
+          port:     ${{ secrets.AZURE_SSH_PORT || 22 }}
+          script: |
+            set -e
+
+            # Clone on first deploy, pull on subsequent ones
+            if [ ! -d /opt/trivia-game ]; then
+              git clone https://github.com/${{ github.repository }} /opt/trivia-game
+            fi
+
+            cd /opt/trivia-game
+            git fetch origin
+            git reset --hard origin/main
+
+            # Write env file from GitHub secrets
+            cat > .env <<EOF
+            GIPHY_API_KEY=${{ secrets.GIPHY_API_KEY }}
+            DOMAIN=${{ secrets.DOMAIN }}
+            EOF
+
+            # Build new images and restart (--no-cache on first deploy, cache after)
+            docker compose pull caddy   # always get latest Caddy patch
+            docker compose build app
+            docker compose up -d --remove-orphans
+
+            # Clean up unused images to reclaim disk space
+            docker image prune -f
