@@ -89,4 +89,22 @@ export const QUESTION_PACKS = [
       { question: 'In which sport would you perform a "slam dunk"?', answer_a: 'Volleyball', answer_b: 'Basketball', answer_c: 'Water Polo', answer_d: 'Handball', correct: 'b', giphy_keyword: 'slam dunk basketball' },
     ],
   },
+  {
+    id: 'customer-support',
+    name: 'Customer Support',
+    emoji: '🎧',
+    description: 'CX terminology, metrics & industry concepts',
+    questions: [
+      { question: 'Which term describes the most common issues customers contact support about or generate the highest ticket volume?', answer_a: 'Common Trends', answer_b: 'Top Call Drivers', answer_c: 'High Priority Cases', answer_d: 'Peak Demand Signals', correct: 'b', giphy_keyword: 'customer support' },
+      { question: 'Which term refers to how AI usage or consumption is tracked and measured?', answer_a: 'Usage Limits', answer_b: 'Data Units', answer_c: 'Processing Points', answer_d: 'Tokens / Credits', correct: 'd', giphy_keyword: 'artificial intelligence' },
+      { question: 'Which term refers to reducing or preventing customers from contacting human support by guiding them to solve issues on their own?', answer_a: 'Deflection', answer_b: 'Escalation', answer_c: 'Routing Optimization', answer_d: 'Call Filtering', correct: 'a', giphy_keyword: 'self service' },
+      { question: 'Which term refers to the layout, buttons and fields that a user directly interacts with in an app, website or product?', answer_a: 'UX', answer_b: 'Visual Framework', answer_c: 'UI', answer_d: 'Front-End Logic', correct: 'c', giphy_keyword: 'app design' },
+      { question: 'Which acronym refers to a metric used to measure how satisfied customers are with their support experience?', answer_a: 'CES', answer_b: 'CSAT', answer_c: 'NPS', answer_d: 'QA Score', correct: 'b', giphy_keyword: 'happy customer' },
+      { question: 'Which term refers to the overall experience a user has when interacting with a product, including how easy or smooth it is to navigate?', answer_a: 'UI', answer_b: 'User Flow Mapping', answer_c: 'Interaction Design', answer_d: 'UX', correct: 'd', giphy_keyword: 'user experience' },
+      { question: 'Which term refers to resources that allow customers to resolve issues on their own without contacting support?', answer_a: 'Self Help', answer_b: 'Automated Support', answer_c: 'Guided Resolution', answer_d: 'Knowledge Routing', correct: 'a', giphy_keyword: 'self service' },
+      { question: 'Which acronym represents the overall experience a customer has with a company across all interactions?', answer_a: 'CSAT', answer_b: 'CRM', answer_c: 'CX', answer_d: 'CLS', correct: 'c', giphy_keyword: 'customer experience' },
+      { question: 'Which acronym refers to the amount of time it takes to fully resolve a customer issue or support ticket?', answer_a: 'SLA', answer_b: 'TTR', answer_c: 'Response Time', answer_d: 'Throughput', correct: 'b', giphy_keyword: 'time clock' },
+      { question: 'Which term refers to a measurable metric used to evaluate how successfully a person, team or organization is achieving its goals?', answer_a: 'Benchmark', answer_b: 'Performance Target', answer_c: 'Success Metric', answer_d: 'KPI', correct: 'd', giphy_keyword: 'success goals' },
+    ],
+  },
 ];
