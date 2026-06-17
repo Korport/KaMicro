@@ -14,8 +14,8 @@ const app = express();
 app.use(cors({ origin: '*' }));
 app.use(express.json());
 
-// Serve pre-built client in production (Dockerfile copies client/dist here)
-const clientDist = path.resolve(__dirname, '../../client/dist');
+// In Docker: WORKDIR=/app, __dirname=/app/src, client/dist is at /app/client/dist
+const clientDist = path.resolve(__dirname, '../client/dist');
 app.use(express.static(clientDist));
 app.get('*', (_req, res) => res.sendFile(path.join(clientDist, 'index.html')));
 
