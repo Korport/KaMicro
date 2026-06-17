@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Papa from 'papaparse';
+import { QUESTION_PACKS } from '../data/questionPacks.js';
 
 const REQUIRED_COLS = ['question', 'answer_a', 'answer_b', 'answer_c', 'answer_d', 'correct', 'giphy_keyword'];
 const VALID_CORRECT = new Set(['a', 'b', 'c', 'd']);
@@ -9,7 +10,7 @@ function validateRows(rows) {
   const errors = [];
   const valid = [];
   rows.forEach((row, i) => {
-    const rowNum = i + 2; // +1 for header, +1 for 1-based
+    const rowNum = i + 2;
     const missing = REQUIRED_COLS.filter((c) => !row[c]?.toString().trim());
     if (missing.length) {
       errors.push(`Row ${rowNum}: missing columns: ${missing.join(', ')}`);
@@ -35,14 +36,22 @@ function validateRows(rows) {
 
 export default function SettingsPage() {
   const [questions, setQuestions] = useState(() => {
-    try { return JSON.parse(localStorage.getItem('trivia_questions') ?? '[]'); }
-    catch { return []; }
+    try { return JSON.parse(localStorage.getItem('trivia_questions') ?? '[]'); } catch { return []; }
+  });
+  const [selectedPackId, setSelectedPackId] = useState(() => {
+    return localStorage.getItem('trivia_selected_pack') ?? null;
   });
   const [errors, setErrors] = useState([]);
   const [timeLimit, setTimeLimit] = useState(() => Number(localStorage.getItem('trivia_time_limit') ?? 20));
   const [dragOver, setDragOver] = useState(false);
   const fileRef = useRef(null);
   const navigate = useNavigate();
+
+  const selectPack = (pack) => {
+    setQuestions(pack.questions);
+    setSelectedPackId(pack.id);
+    setErrors([]);
+  };
 
   const processFile = useCallback((file) => {
     if (!file) return;
@@ -52,6 +61,7 @@ export default function SettingsPage() {
       complete: ({ data }) => {
         const { valid, errors: errs } = validateRows(data);
         setQuestions(valid);
+        setSelectedPackId(null);
         setErrors(errs);
       },
       error: (err) => setErrors([err.message]),
@@ -59,7 +69,6 @@ export default function SettingsPage() {
   }, []);
 
   const onFileChange = (e) => processFile(e.target.files[0]);
-
   const onDrop = (e) => {
     e.preventDefault();
     setDragOver(false);
@@ -69,8 +78,11 @@ export default function SettingsPage() {
   const save = () => {
     localStorage.setItem('trivia_questions', JSON.stringify(questions));
     localStorage.setItem('trivia_time_limit', String(timeLimit));
+    localStorage.setItem('trivia_selected_pack', selectedPackId ?? '');
     navigate('/host');
   };
+
+  const activePack = QUESTION_PACKS.find((p) => p.id === selectedPackId);
 
   return (
     <div className="settings-page">
@@ -81,7 +93,7 @@ export default function SettingsPage() {
         <h1>Settings</h1>
       </div>
 
-      {/* Timer */}
+      {/* ── Time limit ─────────────────────────────────────────── */}
       <div className="card">
         <div style={{ fontWeight: 700, marginBottom: '.75rem' }}>Time per question</div>
         <div className="time-limit-row">
@@ -97,7 +109,31 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      {/* Upload zone */}
+      {/* ── Pre-loaded packs ────────────────────────────────────── */}
+      <div>
+        <div className="section-label">Pre-loaded Question Packs</div>
+        <div className="pack-grid">
+          {QUESTION_PACKS.map((pack) => (
+            <button
+              key={pack.id}
+              className={`pack-card${selectedPackId === pack.id ? ' selected' : ''}`}
+              onClick={() => selectPack(pack)}
+            >
+              <span className="pack-emoji">{pack.emoji}</span>
+              <span className="pack-name">{pack.name}</span>
+              <span className="pack-desc">{pack.description}</span>
+              <span className="pack-count">{pack.questions.length} questions</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Divider ─────────────────────────────────────────────── */}
+      <div className="settings-divider">
+        <span>or upload your own</span>
+      </div>
+
+      {/* ── CSV upload ──────────────────────────────────────────── */}
       <div
         className={`upload-zone${dragOver ? ' drag-over' : ''}`}
         onClick={() => fileRef.current?.click()}
@@ -116,12 +152,14 @@ export default function SettingsPage() {
         <input ref={fileRef} type="file" accept=".csv,text/csv" onChange={onFileChange} />
       </div>
 
-      {/* Stats */}
+      {/* ── Stats ───────────────────────────────────────────────── */}
       {questions.length > 0 && (
         <div className="csv-stats">
           <div className="csv-stat">
             <div className="csv-stat-value">{questions.length}</div>
-            <div className="csv-stat-label">Valid questions</div>
+            <div className="csv-stat-label">
+              {activePack ? `${activePack.emoji} ${activePack.name}` : 'Custom CSV'}
+            </div>
           </div>
           <div className="csv-stat">
             <div className="csv-stat-value" style={{ color: errors.length ? 'var(--a)' : '#4caf50' }}>
@@ -132,14 +170,14 @@ export default function SettingsPage() {
         </div>
       )}
 
-      {/* Errors */}
+      {/* ── CSV errors ──────────────────────────────────────────── */}
       {errors.length > 0 && (
         <div className="error-list">
           {errors.map((e, i) => <div key={i} className="error-item">⚠ {e}</div>)}
         </div>
       )}
 
-      {/* Preview */}
+      {/* ── Preview ─────────────────────────────────────────────── */}
       {questions.length > 0 && (
         <div className="card" style={{ fontSize: '.85rem' }}>
           <div style={{ fontWeight: 700, marginBottom: '.5rem' }}>Preview (first 3)</div>
@@ -158,16 +196,13 @@ export default function SettingsPage() {
         </div>
       )}
 
+      {/* ── Actions ─────────────────────────────────────────────── */}
       <div className="settings-actions">
-        <button
-          className="btn btn-primary"
-          onClick={save}
-          disabled={questions.length === 0}
-        >
+        <button className="btn btn-primary" onClick={save} disabled={questions.length === 0}>
           Save & Return to Lobby ({questions.length} questions)
         </button>
         {questions.length > 0 && (
-          <button className="btn btn-secondary" onClick={() => { setQuestions([]); setErrors([]); }}>
+          <button className="btn btn-secondary" onClick={() => { setQuestions([]); setSelectedPackId(null); setErrors([]); }}>
             Clear
           </button>
         )}

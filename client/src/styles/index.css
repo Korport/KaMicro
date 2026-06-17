@@ -586,6 +586,61 @@ input[type="text"]:focus {
 .player-end .final-label { color: var(--muted); font-size: 1rem; }
 .player-end .final-score { font-size: 1.8rem; font-weight: 900; }
 
+/* ─── Question pack cards ────────────────────────────────────── */
+.section-label {
+  font-size: .8rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: .75rem;
+}
+
+.pack-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: .75rem;
+}
+
+.pack-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .4rem;
+  background: var(--surface);
+  border: 2px solid transparent;
+  border-radius: var(--radius-lg);
+  padding: 1.25rem 1rem;
+  cursor: pointer;
+  text-align: center;
+  transition: border-color var(--transition), background var(--transition), transform var(--transition);
+  color: var(--text);
+}
+.pack-card:hover { background: var(--surface2); transform: translateY(-2px); }
+.pack-card.selected {
+  border-color: var(--accent);
+  background: rgba(255,137,6,.1);
+}
+
+.pack-emoji { font-size: 2.2rem; line-height: 1; }
+.pack-name  { font-weight: 800; font-size: 1rem; }
+.pack-desc  { font-size: .75rem; color: var(--muted); line-height: 1.3; }
+.pack-count { font-size: .75rem; color: var(--accent); font-weight: 700; margin-top: .2rem; }
+
+.settings-divider {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: var(--muted);
+  font-size: .85rem;
+}
+.settings-divider::before,
+.settings-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #2a2a4a;
+}
+
 /* ─── Settings page ──────────────────────────────────────────── */
 .settings-page {
   max-width: 700px;
